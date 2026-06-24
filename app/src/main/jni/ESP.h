@@ -5,6 +5,7 @@
 #include "Struct/Rect.h"
 #include "ImGui/imgui.h"
 #include "Hooks.h"
+#include <vector>
 
 namespace ESP {
     extern bool esp_line;
