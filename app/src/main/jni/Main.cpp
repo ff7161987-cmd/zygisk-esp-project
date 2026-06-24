@@ -9,17 +9,14 @@
 #include <Il2Cpp.h>
 #include "dobby.h"
 #include "Struct/Gui.hpp"
-#include "Struct/Drawing.h"
-#include "Struct/Class.h"
 #include "zygisk.hpp"
+
+#include "Hooks.h" // Inclui o novo arquivo de hooks
+#include "ESP.h"   // Inclui o novo arquivo de ESP
 
 using zygisk::Api;
 using zygisk::AppSpecializeArgs;
 using zygisk::ServerSpecializeArgs;
-
-bool esp_line = false;
-bool esp_box = false;
-bool esp_name = false;
 
 void hack();
 
@@ -55,21 +52,6 @@ class MyModule : public zygisk::ModuleBase {
   bool is_game_ = false;
 };
 
-// ========================= ESP LOGIC ========================= \\
-
-void DrawESP() {
-    if (!esp_line && !esp_box && !esp_name) return;
-    
-    ImGuiIO &io = ImGui::GetIO();
-    ImVec2 screen_center = ImVec2(io.DisplaySize.x / 2, io.DisplaySize.y);
-    ImVec2 dummy_pos = ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
-    ImVec4 color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-
-    if (esp_line) Drawing::DrawLine(screen_center, dummy_pos, color);
-    if (esp_box) Drawing::DrawBox(Rect(dummy_pos.x - 50, dummy_pos.y - 100, 100, 200), color);
-    if (esp_name) Drawing::DrawText2(20.0f, ImVec2(dummy_pos.x - 20, dummy_pos.y - 120), color, "Enemy");
-}
-
 // ========================= IMGUI HOOK ========================= \\
 
 uintptr_t il2cpp_base = 0;
@@ -87,13 +69,15 @@ inline EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     ImGui_ImplAndroid_NewFrame(g_GlWidth, g_GlHeight);
     ImGui::NewFrame();
 
-    DrawESP();
+    // Chama a função de desenho do ESP do namespace ESP
+    ESP::DrawESP();
 
+    // Menu Rendering
     ImGui::SetNextWindowSize(ImVec2((float) g_GlWidth * 0.30f, (float) g_GlHeight * 0.52f), ImGuiCond_Once);
     if (ImGui::Begin(OBFUSCATE("Zygisk Menu"), 0, ImGuiWindowFlags_NoBringToFrontOnFocus)) {
-        ImGui::Checkbox("Line ESP", &esp_line);
-        ImGui::Checkbox("Box ESP", &esp_box);
-        ImGui::Checkbox("Name ESP", &esp_name);
+        ImGui::Checkbox("Line ESP", &ESP::esp_line);
+        ImGui::Checkbox("Box ESP", &ESP::esp_box);
+        ImGui::Checkbox("Name ESP", &ESP::esp_name);
     }
     ImGui::End();
 
@@ -111,6 +95,7 @@ void hack_thread(pid_t pid) {
     
     if (il2cpp_base != 0) {
         Il2CppAttach();
+        UnityFunctions::UpdateAddresses(); // Atualiza os endereços dinamicamente
     }
 
     void *ptr_eglSwapBuffer = DobbySymbolResolver("/system/lib/libEGL.so", "eglSwapBuffers");

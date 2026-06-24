@@ -26,12 +26,18 @@ LOCAL_C_INCLUDES       += $(LOCAL_PATH)/imgui
 LOCAL_C_INCLUDES       += $(LOCAL_PATH)/KittyMemory
 LOCAL_C_INCLUDES       += $(LOCAL_PATH)/Unity
 
+# Adicionando os novos includes para Hooks e ESP
+LOCAL_C_INCLUDES       += $(LOCAL_PATH)/Struct
+
 # Coletando arquivos fonte
 FILE_LIST               := $(wildcard $(LOCAL_PATH)/imgui/*.c*)
 FILE_LIST               += $(wildcard $(LOCAL_PATH)/xdl/*.c*)
 FILE_LIST               += $(wildcard $(LOCAL_PATH)/KittyMemory/*.c*)
 FILE_LIST               += $(wildcard $(LOCAL_PATH)/Unity/*.cpp)
 FILE_LIST               += $(wildcard $(LOCAL_PATH)/*.cpp)
+
+# Adicionando o novo arquivo ESP.cpp
+FILE_LIST               += $(wildcard $(LOCAL_PATH)/ESP.cpp)
 
 LOCAL_SRC_FILES        := $(FILE_LIST:$(LOCAL_PATH)/%=%)
 

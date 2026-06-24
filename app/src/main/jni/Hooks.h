@@ -11,7 +11,7 @@
 #define GET_METHOD(lib, ns, cls, meth, args) Il2CppGetMethodOffset(OBFUSCATE(lib), OBFUSCATE(ns), OBFUSCATE(cls), OBFUSCATE(meth), args)
 #define GET_FIELD(lib, ns, cls, field) Il2CppGetFieldOffset(OBFUSCATE(lib), OBFUSCATE(ns), OBFUSCATE(cls), OBFUSCATE(field))
 
-// Estruturas Unity básicas
+// Estruturas Unity básicas (se necessário, podem ser movidas para um arquivo Unity.h mais abrangente)
 struct Vector3 {
     float x, y, z;
     static Vector3 Zero() { return {0, 0, 0}; }
@@ -21,20 +21,22 @@ struct Vector2 {
     float x, y;
 };
 
-// Funções de auto-update para endereços essenciais
+// Funções de auto-update para endereços essenciais da Unity
 namespace UnityFunctions {
     inline void* Camera_get_main = nullptr;
     inline void* Camera_WorldToScreenPoint = nullptr;
     inline void* Transform_get_position = nullptr;
     inline void* Component_get_transform = nullptr;
+    // Adicione aqui outros métodos ou campos da Unity que precisar encontrar dinamicamente
 
     inline void UpdateAddresses() {
+        // Exemplo de como buscar os endereços dinamicamente
         Camera_get_main = GET_METHOD("UnityEngine.CoreModule.dll", "UnityEngine", "Camera", "get_main", 0);
         Camera_WorldToScreenPoint = GET_METHOD("UnityEngine.CoreModule.dll", "UnityEngine", "Camera", "WorldToScreenPoint", 1);
         Transform_get_position = GET_METHOD("UnityEngine.CoreModule.dll", "UnityEngine", "Transform", "get_position", 0);
         Component_get_transform = GET_METHOD("UnityEngine.CoreModule.dll", "UnityEngine", "Component", "get_transform", 0);
         
-        LOGD("Endereços atualizados via IL2CPP");
+        LOGD("UnityFunctions: Endereços atualizados via IL2CPP");
     }
 }
 
