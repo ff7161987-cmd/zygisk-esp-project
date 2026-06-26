@@ -1,5 +1,6 @@
 #include "ESP.h"
 #include "Hooks.h"
+#include "Struct/Class.h" // Inclui Class.h para acesso às macros e wrappers
 #include <vector>
 #include <string>
 
@@ -8,15 +9,22 @@ namespace ESP {
     bool esp_box = false;
     bool esp_name = false;
 
+    // Estrutura para representar um jogador, usando o void* para o objeto real do jogo
+    struct GamePlayer {
+        void* object;
+        // Adicione outros campos relevantes se necessário, como ponteiro para o transform, etc.
+    };
+
     // Função dummy para simular a obtenção de uma lista de jogadores
     // Em um cenário real, esta função precisaria ser hookada ou o campo estático
     // que contém a lista de jogadores precisaria ser lido via IL2CPP.
-    std::vector<Player_t*> GetDummyPlayerList() {
-        std::vector<Player_t*> players;
+    std::vector<GamePlayer> GetGamePlayerList() {
+        std::vector<GamePlayer> players;
         // Adicione jogadores fictícios para teste
         // Em um jogo real, você obteria isso do motor IL2CPP
-        players.push_back(new Player_t{ (void*)0x1 }); // Dummy player 1
-        players.push_back(new Player_t{ (void*)0x2 }); // Dummy player 2
+        // Exemplo: iterar sobre uma lista de objetos de jogo e filtrar jogadores
+        players.push_back({ (void*)0x1 }); // Dummy player 1
+        players.push_back({ (void*)0x2 }); // Dummy player 2
         return players;
     }
 
@@ -26,34 +34,40 @@ namespace ESP {
         ImGuiIO &io = ImGui::GetIO();
         ImVec2 screen_center = ImVec2(io.DisplaySize.x / 2, io.DisplaySize.y);
 
-        // Obter a câmera principal (se o hook estiver funcionando)
-        Camera_t* mainCamera = UnityFunctions::GetMainCamera();
+        // Obter a câmera principal usando o wrapper de Class.h
+        void* mainCamera = Camera_main();
         if (!mainCamera) {
             // LOGD("Main Camera not found!");
             return;
         }
 
         // Iterar sobre a lista de jogadores (usando a dummy list por enquanto)
-        std::vector<Player_t*> players = GetDummyPlayerList(); // Substituir por UnityFunctions::GetPlayerList() quando implementado
+        std::vector<GamePlayer> players = GetGamePlayerList();
 
-        for (Player_t* player : players) {
-            if (!player) continue;
+        for (GamePlayer gamePlayer : players) {
+            if (!gamePlayer.object) continue;
 
-            // Obter a posição do jogador no mundo
-            Vector3 worldPos = UnityFunctions::GetPlayerPosition(player);
-            if (worldPos.x == 0 && worldPos.y == 0 && worldPos.z == 0) continue; // Posição inválida
+            // Obter o transform do jogador
+            void* playerTransform = Component_GetTransform(gamePlayer.object);
+            if (!playerTransform) continue;
 
-            // Converter a posição do mundo para a tela
-            Vector3 screenPos3D = UnityFunctions::WorldToScreenPoint(mainCamera, worldPos);
+            // Obter a posição do jogador no mundo usando o wrapper de Class.h
+            Vvector3 worldPos = get_position(playerTransform);
+            if (worldPos.X == 0 && worldPos.Y == 0 && worldPos.Z == 0) continue; // Posição inválida
+
+            // Converter a posição do mundo para a tela usando o wrapper de Class.h
+            Vvector3 screenPos3D = WorldToScreenPoint(mainCamera, worldPos);
             
             // Unity WorldToScreenPoint retorna Y invertido e Z indica se está na tela
-            if (screenPos3D.z < 0) continue; // Fora da tela ou atrás da câmera
+            if (screenPos3D.Z < 0) continue; // Fora da tela ou atrás da câmera
 
-            ImVec2 screenPos = ImVec2(screenPos3D.x, io.DisplaySize.y - screenPos3D.y); // Inverter Y
+            ImVec2 screenPos = ImVec2(screenPos3D.X, io.DisplaySize.y - screenPos3D.Y); // Inverter Y
 
             ImVec4 color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f); // Cor padrão: Vermelho
-            // if (UnityFunctions::IsLocalPlayer(player)) color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f); // Verde para jogador local
-            // else if (UnityFunctions::IsEnemy(player)) color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f); // Vermelho para inimigo
+            
+            // Exemplo de como usar as funções de Class.h para determinar cor
+            // if (IsLocal(gamePlayer.object)) color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f); // Verde para jogador local
+            // else if (!get_isLocalTeam(gamePlayer.object)) color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f); // Vermelho para inimigo (não é local e não é do time)
             // else color = ImVec4(1.0f, 1.0f, 0.0f, 1.0f); // Amarelo para outros
 
             // Desenhar ESP
@@ -68,8 +82,11 @@ namespace ESP {
                 Drawing::DrawBox(box_rect, color);
             }
             if (esp_name) {
-                // const char* playerName = UnityFunctions::GetPlayerName(player);
+                monoString* nameMonoStr = get_NickName(gamePlayer.object);
                 const char* playerName = "Player Name"; // Placeholder
+                if (nameMonoStr) {
+                    playerName = nameMonoStr->CString();
+                }
                 Drawing::DrawText2(20.0f, ImVec2(screenPos.x - (ImGui::CalcTextSize(playerName).x / 2), screenPos.y - boxHeight - 20), color, playerName);
             }
         }
