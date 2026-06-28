@@ -1,4 +1,3 @@
-#include "UniversalESP.h"
 
 #pragma once
 #include <stdio.h>
@@ -81,7 +80,7 @@ void DrawCircleHealth(ImVec2 position, int health, int max_health, float radius)
         healthColor = IM_COL32(180, 45, 45, 255);
     }
     ImGui::GetForegroundDrawList()->PathArcTo(position, radius, (-(a_max / 4.0f)) + (a_max / max_health) * (max_health - health), a_max - (a_max / 4.0f));
-    ImGui::GetForegroundDrawList()->PathStroke(healthColor, ImDrawFlags_None, 4.0f);
+    ImGui::GetForegroundDrawList()->PathStroke(healthColor, ImDrawFlags_None, 4);
 }
 
 
@@ -189,7 +188,7 @@ void *GetClosestEnemy() {
     void* get_MatchGame = Curent_Match();
     void* LocalPlayer = GetLocalPlayer(get_MatchGame);
     if (LocalPlayer != NULL && get_MatchGame != NULL && Enable && get_MatchGame) {
-        monoDictionary<uint8_t *, void **> *players = *(monoDictionary<uint8_t*, void **> **)((long)get_MatchGame + UNIVERSAL_LIST_OFFSET);
+        monoDictionary<uint8_t *, void **> *players = *(monoDictionary<uint8_t*, void **> **)((long)get_MatchGame + m_ShortIDToPlayers);
         for (int u = 0; u < players->getNumValues(); u++) {
             void* Player = players->getValues()[u]; 
             if (Player != NULL && !get_isLocalTeam(Player) && !get_IsDieing(Player) && get_isVisible(Player) && get_MaxHP(Player)) {    
@@ -247,8 +246,8 @@ inline void DrawESP(float screenWidth, float screenHeight) {
     if (!draw) return;
 if (Aimbot) {
 void* CurrentMatch = Curent_Match();
-if (!UNIVERSAL_READY) return; void* closestEnemy = GetClosestEnemy();
-if (!CurrentMatch) return; void* LocalPlayer = GetLocalPlayer(CurrentMatch);
+void* closestEnemy = GetClosestEnemy();
+void* LocalPlayer = GetLocalPlayer(CurrentMatch);
 
 if (closestEnemy != NULL && LocalPlayer != NULL && CurrentMatch != NULL) {
     Vector3 EnemyLocation = GetHeadPosition(closestEnemy);
@@ -268,24 +267,24 @@ if (closestEnemy != NULL && LocalPlayer != NULL && CurrentMatch != NULL) {
     
 }
 }
-if (Enable && UNIVERSAL_READY) {        
+if (Enable) {        
         int enemyIndex = 0; 
         void* current_Match = Curent_Match();
         void* local_player = GetLocalPlayer(current_Match);
 
-        if (local_player && current_Match && UNIVERSAL_READY) {
-            if (UNIVERSAL_LIST_OFFSET == (size_t)-1) return; auto* players_ptr = (void**)((long)current_Match + UNIVERSAL_LIST_OFFSET); if (!players_ptr || !*players_ptr) return; auto* players = *(monoDictionary<uint8_t*, void**>**)players_ptr;
+        if (local_player && current_Match) {
+            auto* players = *(monoDictionary<uint8_t*, void**>**)((long)current_Match + m_ShortIDToPlayers);
             void* camera = Camera_main();
 
             if (players && camera) {
                 for (int u = 0; u < players->getNumValues(); u++) {
                     void* closestEnemy = players->getValues()[u];
                   if (closestEnemy != local_player && closestEnemy && get_isVisible(closestEnemy) && !get_isLocalTeam(closestEnemy, true)) {enemyIndex++;
-                        Vector3 Toepos = UNIVERSAL_GET_POS(closestEnemy);
-                        Vector3 Toeposi = UNIVERSAL_W2S(Toepos);
+                        Vector3 Toepos = getPosition(closestEnemy);
+                        Vector3 Toeposi = WorldToScreenPoint(camera, Toepos);
                         if (Toeposi.z < 1) continue;
-                        Vector3 HeadPos = UNIVERSAL_GET_POS(closestEnemy) + Vector3(0, 1.9f, 0);
-                        Vector3 HeadPosition = UNIVERSAL_W2S(HeadPos);
+                        Vector3 HeadPos = getPosition(closestEnemy) + Vector3(0, 1.9f, 0);
+                        Vector3 HeadPosition = WorldToScreenPoint(camera, HeadPos);
                         if (HeadPosition.z < 1) continue;
                         {float cx = screenWidth / 2.0f;
                         float cy = screenHeight / 2.0f;
@@ -449,7 +448,7 @@ if(Aimbot) {
 if (SilentAim) {
 void *CurrentMatch = Curent_Match();
 if (CurrentMatch != NULL) {
-if (!CurrentMatch) return; void* LocalPlayer = GetLocalPlayer(CurrentMatch);
+void* LocalPlayer = GetLocalPlayer(CurrentMatch);
 if (LocalPlayer != NULL)  {
 bool visible = get_isVisible(LocalPlayer);
 if (visible) {

@@ -1,5 +1,5 @@
 #pragma once
-bool Enable;
+inline bool Enable = false;
 int AimCheck = 0;
 int AimType = 0;
 int AimWhen = 1;
@@ -52,7 +52,7 @@ int is_SpeedTime;
 float visual_circle_size,visual_circle_stroke,visual_lined_size,visual_lined_stroke,visual_esp_line = 1,visual_esp_box = 1,visual_esp_boxth = 1,visual_esp_box_filedth = 1,visual_esp_box_filed = 1,visual_esp_skel = 1;
 int visual_esp_line_type = 0;
 float Fov_Aim,Aimdis;
-bool Aimbot;
+inline bool Aimbot = false;
 std::string int_to_string(int num)
 {
      std::string str = std::to_string(num);

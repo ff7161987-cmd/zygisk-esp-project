@@ -170,7 +170,7 @@ void hack_thread(pid_t pid) {
         return;
     }
     
-    sleep(10);
+    sleep(5);
     Il2CppAttach();
     
     void* addr_bypass = (void*)Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("UpdateRotation"), 2);
