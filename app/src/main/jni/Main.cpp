@@ -101,8 +101,6 @@ void SetElegantBlackAndBlueTheme()
 }
 
 uintptr_t il2cpp_base = 0;
-int g_GlWidth = 0, g_GlHeight = 0;
-bool g_IsSetup = false;
 bool g_HackAttached = false;
 void *getRealAddr(ulong offset) {
     return reinterpret_cast<void*>(il2cpp_base + offset);
@@ -202,6 +200,7 @@ void StartGUI() {
 }
 
 
+
 void hack_thread(pid_t pid) {
     LOGD("Hack thread started");
     for (int i = 0; i < 30; i++) {
@@ -214,8 +213,8 @@ void hack_thread(pid_t pid) {
         return;
     }
     
-    // Esperar o jogo inicializar os metadados do Il2Cpp
-    sleep(25);
+    // Esperar o jogo inicializar
+    sleep(5);
     LOGD("Attaching Il2Cpp");
     Il2CppAttach();
     
@@ -239,18 +238,6 @@ void hack_thread(pid_t pid) {
     }
 
     // Iniciar GUI por último
-    StartGUI();
-    g_HackAttached = true;
-}
-
-    if (il2cpp_base == 0) return;
-    sleep(10);
-    Il2CppAttach();
-    
-    DobbyHook((void*)Il2CppGetMethodOffset("Assembly-CSharp.dll", "COW.GamePlay", "Player", "UpdateRotation", 2), (void *) Modify_Bypass_RamaModz, (void **)&ori_bypass_ramamodz);
-    DobbyHook((void*)Il2CppGetMethodOffset("Assembly-CSharp.dll", "COW.GamePlay", "FollowCamera", "get_OffsetForNormal", 0), (void *)_GetCameraHeightRateValue, (void **)&GetCameraHeightRateValue);
-    DobbyHook((void*)Il2CppGetMethodOffset("Assembly-CSharp.dll", "COW", "GameConfig", "get_ResetGuest", 0), (void *)_ResetGuest, (void **)&ResetGuest);
-    
     StartGUI();
     g_HackAttached = true;
 }
