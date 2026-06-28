@@ -122,7 +122,7 @@ namespace Universal {
             try {
                 // No ARM64, chamadas diretas a ponteiros resolvidos por dlsym/xdl precisam ser cuidadosas
                 typedef Ret (*Func)(Args...);
-                return if (meta.address) { return reinterpret_cast<Func>(meta.address)(args...); } return Ret();
+                if (meta.address) { return reinterpret_cast<Func>(meta.address)(args...); } return Ret();
             } catch (...) {
                 ULOGE("EXCEPTION: Crash prevented during safeInvoke at %p", (void*)meta.address);
                 return Ret();
