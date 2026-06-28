@@ -81,7 +81,7 @@ void DrawCircleHealth(ImVec2 position, int health, int max_health, float radius)
         healthColor = IM_COL32(180, 45, 45, 255);
     }
     ImGui::GetForegroundDrawList()->PathArcTo(position, radius, (-(a_max / 4.0f)) + (a_max / max_health) * (max_health - health), a_max - (a_max / 4.0f));
-    ImGui::GetForegroundDrawList()->PathStroke(healthColor, 4, ImDrawFlags_None);
+    ImGui::GetForegroundDrawList()->PathStroke(healthColor, 4.0f, ImDrawFlags_None);
 }
 
 
