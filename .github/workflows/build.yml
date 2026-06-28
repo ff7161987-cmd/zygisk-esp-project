@@ -1,35 +1,29 @@
 name: Android NDK Build
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
-
     - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
         java-version: '11'
         distribution: 'temurin'
-
     - name: Setup Android NDK
       uses: nttld/setup-ndk@v1
       with:
-        ndk-version: r21e # Versão estável para projetos NDK antigos/AIDE
-
+        ndk-version: r21e
     - name: Build with ndk-build
       run: |
         cd app/src/main/jni
-        ndk-build APP_ABI=arm64-v8a
-
+        ndk-build clean
+        ndk-build APP_ABI=arm64-v8a -B
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
