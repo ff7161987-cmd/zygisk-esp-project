@@ -1,4 +1,4 @@
-#include "UniversalESP.h"
+#include "Universal/ESP_Framework.hpp"
 
 #pragma once
 #include <stdio.h>
@@ -189,7 +189,7 @@ void *GetClosestEnemy() {
     void* get_MatchGame = Curent_Match();
     void* LocalPlayer = GetLocalPlayer(get_MatchGame);
     if (LocalPlayer != NULL && get_MatchGame != NULL && Enable && get_MatchGame) {
-        monoDictionary<uint8_t *, void **> *players = *(monoDictionary<uint8_t*, void **> **)((long)get_MatchGame + m_ShortIDToPlayers);
+        monoDictionary<uint8_t *, void **> *players = *(monoDictionary<uint8_t*, void **> **)((long)get_MatchGame + Universal::Framework::GetPlayerListOffset());
         for (int u = 0; u < players->getNumValues(); u++) {
             void* Player = players->getValues()[u]; 
             if (Player != NULL && !get_isLocalTeam(Player) && !get_IsDieing(Player) && get_isVisible(Player) && get_MaxHP(Player)) {    
@@ -274,18 +274,18 @@ if (Enable) {
         void* local_player = GetLocalPlayer(current_Match);
 
         if (local_player && current_Match) {
-            auto* players = *(monoDictionary<uint8_t*, void**>**)((long)current_Match + m_ShortIDToPlayers);
+            auto* players = *(monoDictionary<uint8_t*, void**>**)((long)current_Match + Universal::Framework::GetPlayerListOffset());
             void* camera = Camera_main();
 
             if (players && camera) {
                 for (int u = 0; u < players->getNumValues(); u++) {
                     void* closestEnemy = players->getValues()[u];
                   if (closestEnemy != local_player && closestEnemy && get_isVisible(closestEnemy) && !get_isLocalTeam(closestEnemy, true)) {enemyIndex++;
-                        Vector3 Toepos = getPosition(closestEnemy);
-                        Vector3 Toeposi = WorldToScreenPoint(camera, Toepos);
+                        Vector3 Toepos = Universal::Framework::GetPlayerPosition(closestEnemy);
+                        Vector3 Toeposi = Universal::Framework::WorldToScreen(Toepos);
                         if (Toeposi.z < 1) continue;
-                        Vector3 HeadPos = getPosition(closestEnemy) + Vector3(0, 1.9f, 0);
-                        Vector3 HeadPosition = WorldToScreenPoint(camera, HeadPos);
+                        Vector3 HeadPos = Universal::Framework::GetPlayerPosition(closestEnemy) + Vector3(0, 1.9f, 0);
+                        Vector3 HeadPosition = Universal::Framework::WorldToScreen(HeadPos);
                         if (HeadPosition.z < 1) continue;
                         {float cx = screenWidth / 2.0f;
                         float cy = screenHeight / 2.0f;

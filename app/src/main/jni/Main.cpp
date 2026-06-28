@@ -1,4 +1,4 @@
-#include "Struct/UniversalESP.h"
+#include "Struct/Universal/ESP_Framework.hpp"
 #include <android/log.h>
 #include <unistd.h>
 #include <thread>
@@ -289,6 +289,7 @@ void hack_thread(pid_t pid) {
 
 
     Il2CppAttach();
+    Universal::Framework::Setup("Assembly-CSharp.dll", "COW.GamePlay", "Match", "m_ShortIDToPlayers");
 DobbyHook(Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("UpdateRotation"), 2), (void *) Modify_Bypass_RamaModz, (void **)&ori_bypass_ramamodz);
 DobbyHook(Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("FollowCamera"), OBFUSCATE("get_OffsetForNormal"), 0),(void *)_GetCameraHeightRateValue, (void **)&GetCameraHeightRateValue);
 DobbyHook(Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW"), OBFUSCATE("GameConfig"), OBFUSCATE("get_ResetGuest"), 0), (void *)_ResetGuest, (void **)&ResetGuest);
