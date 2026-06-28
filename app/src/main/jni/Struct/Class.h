@@ -1,7 +1,20 @@
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
+// CREDIT: @RAMA_MODZ
 #pragma once
-
-
-
 class Vvector3 {
 public:
     float X;
@@ -29,10 +42,6 @@ Vvector3::~Vvector3() {}
 #define Class_Screen__get_density (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Screen"), OBFUSCATE("get_dpi"))
 
 
-
- #define Camera_get_fieldOfView (uintptr_t) Il2CppGetMethodOffset("UnityEngine.dll", "UnityEngine", "Camera", "get_fieldOfView")
-#define Camera_set_fieldOfView (uintptr_t) Il2CppGetMethodOffset("UnityEngine.dll", "UnityEngine", "Camera", "set_fieldOfView", 1)
-
 #define ForWard (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_forward"), 0)
 
 #define Class_Transform__GetPosition Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_position_Injected"), 1)
@@ -45,8 +54,6 @@ Vvector3::~Vvector3() {}
 #define Class_Component__get_transform (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Component"), OBFUSCATE("get_transform"), 0)
 #define Class_Transform__get_position (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_position"), 0)
 
-#define Class_Transform__Position Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_position"), 0)
-
 
 #define Class_Transform__Rotation Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_rotation"), 0)
 
@@ -54,9 +61,13 @@ Vvector3::~Vvector3() {}
 #define Class_Compent__Transform Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Component"), OBFUSCATE("get_transform"), 0)
 //Class Player
 
+ #define Camera_get_fieldOfView (uintptr_t) Il2CppGetMethodOffset("UnityEngine.dll", "UnityEngine", "Camera", "get_fieldOfView")
+#define Camera_set_fieldOfView (uintptr_t) Il2CppGetMethodOffset("UnityEngine.dll", "UnityEngine", "Camera", "set_fieldOfView", 1)
+
 void *get_main() {
     return reinterpret_cast<void *(__fastcall *)()>(Class_Camera__get_main)();
 }
+
 
 float get_fieldOfView() {
     return reinterpret_cast<float(__fastcall *)(void *)>(Camera_get_fieldOfView)(get_main());
@@ -65,9 +76,6 @@ float get_fieldOfView() {
 void *set_fieldOfView(float value) {
     return reinterpret_cast<void *(__fastcall *)(void *, float)>(Camera_set_fieldOfView)(get_main(), value);
 }
-
-
-
 
 static void Transform_INTERNAL_SetPosition(void *player, Vvector3 inn) {
     void (*Transform_INTERNAL_SetPosition)(void *transform, Vvector3 in) = (void (*)(void *, Vvector3))(Class_Transform__SetPosition);
@@ -85,13 +93,11 @@ static Quaternion GetRotation(void* player) {
 #define Class_Component__get_transform (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Component"), OBFUSCATE("get_transform"), 0)
 #define Class_Transform__get_position (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_position"), 0)
 
-#define Class_Transform__Position Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_position"), 0)
+#define Class_Transform__Position (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.CoreModule.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_position"), 0)
 
 #define Class_Compent__Transform Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Component"), OBFUSCATE("get_transform"), 0)
-
-/*
 //Class Player
-#define ListPlayer (uintptr_t) Il2CppGetFieldOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("NFJPHMKKEBF"), OBFUSCATE("HOOCHDLKOOG"))
+#define ListPlayer (uintptr_t) Il2CppGetFieldOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Match"), OBFUSCATE("m_ShortIDToPlayers"))
 
 
 #define EnemyUpdate (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("LateUpdate"), 0)
@@ -108,9 +114,7 @@ static Quaternion GetRotation(void* player) {
 
 #define Visible (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("IsVisible"), 0)
 
-
-#define Team (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("IsLocalTeammate"), 0)
-
+#define Team (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("IsLocalTeammate"), 1)
 
 #define Die (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("get_IsDieing"), 0)
 
@@ -121,8 +125,7 @@ static Quaternion GetRotation(void* player) {
 
 #define Name (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("get_NickName"), 0)
 
-#define Aim (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("SetAimRotation"), 1)
-
+#define Aim (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("set_m_AimRotation"), 1)
 #define Scope (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("get_IsSighting"),0 )
 
 #define Fire (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("IsFiring"), 0)
@@ -137,25 +140,34 @@ static Quaternion GetRotation(void* player) {
 
 #define ForWard (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_forward"), 0)
 
-#define Report1 (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW"), OBFUSCATE("InteractionPopUtil"), OBFUSCATE("CreateReportPlayer"), 3)
-
-#define Report2 (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW"), OBFUSCATE("UIHudMatchResultItemBaseController"), OBFUSCATE("SetReportData"), 4)
-
-#define Report3 (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW"), OBFUSCATE("UIModelVoice"), OBFUSCATE("get_ReportedPlayerTimeDict"), 0)
-
-#define Report4 (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW"), OBFUSCATE("InteractionPopUtil"), OBFUSCATE("CreateAddToBlackList"), 3)
-
 
 #define CharGet (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("mscorlib.dll"), OBFUSCATE("System"), OBFUSCATE("String"), OBFUSCATE("get_Chars"), 1)
 
+#define Team (uintptr_t) Il2CppGetMethodOffset("Assembly-CSharp.dll", "COW.GamePlay", "Player", "IsLocalTeammate", 1)
+#define m_ShortIDToPlayers (uintptr_t) Il2CppGetFieldOffset("Assembly-CSharp.dll", "COW.GamePlay", "Match", "m_ShortIDToPlayers")
 
-#define Raycast (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("JEAGCMACNNC"), OBFUSCATE("PLDCHDBCOBF"), 4)
+#define Raycast (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("PhysicsUtil"), OBFUSCATE("SingleLineCheck"), 4)
 
+
+
+
+#define Hip (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("GetHipTF"), 0)
 
 #define HeadColider (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("get_HeadCollider"), 0)
 
 #define Time (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Time"), OBFUSCATE("get_deltaTime"), 0)
+static void *GetHipPositions(void *player) {
+    void *(*_GetHipPositions)(void *players) = (void*(*)(void *))(Hip);
+     return _GetHipPositions(player);
+}
+ Vector3 get_position(void *player) {
+    Vector3 (*_get_position)(void *players) = (Vector3 (*)(void *))(Class_Transform__Position);
+    return _get_position(player);
+}
 
+static Vector3 GetHipPosition(void* player) {
+    return get_position(GetHipPositions(player));
+}
 
 static void *Player_GetHeadCollider(void *player) {
     void *(*_Player_GetHeadCollider)(void *players) = (void *(*)(void *))(HeadColider);
@@ -188,10 +200,6 @@ static void *GetHeadPositions(void *player) {
 }
 
 
- Vector3 get_position(void *player) {
-    Vector3 (*_get_position)(void *players) = (Vector3 (*)(void *))(Class_Transform__Position);
-    return _get_position(player);
-}
 
 
 static void *Component_GetTransform(void *player) {
@@ -285,6 +293,12 @@ static bool get_IsFiring(void *player) {
     return _get_IsFiring(player);
 }
 
+
+static bool get_isLocalTeam(void *player, bool isCheckSocial3pEffect) {
+    bool (*_get_isLocalTeam)(void *, bool) = (bool (*)(void *, bool))(Team);
+    return _get_isLocalTeam(player, isCheckSocial3pEffect);
+}
+
 static bool Physics_Raycast(Vector3 camLocation, Vector3 headLocation, unsigned int LayerID, void* collider) {
     bool (*_Physics_Raycast)(Vector3 camLocation, Vector3 headLocation, unsigned int LayerID, void* collider) = (bool(*)(Vector3, Vector3, unsigned int, void*))(Raycast);
     return _Physics_Raycast(camLocation, headLocation, LayerID, collider);
@@ -303,6 +317,12 @@ static Vector3 CameraMain(void* player){
 }
 
 
+Vector3 get_mousePosition(void *_this) {
+	Vector3 (*_get_mousePosition)(void *_this) = (Vector3 (*)(void *)) (Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Input"), OBFUSCATE("get_mousePosition"), 0));
+	return _get_mousePosition(_this);
+}
+
+
 
 int get_width() {
     return reinterpret_cast<int(__fastcall *)()>(Class_Screen__get_width)();
@@ -317,6 +337,10 @@ float get_density() {
 }
 
 
-*/
+
+
+
+
+
 
 

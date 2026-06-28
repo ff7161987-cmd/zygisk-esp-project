@@ -10,11 +10,15 @@
 #include "imgui_impl_opengl3.h"
 #include "main.h"
 #include "Struct/tools.hpp"
-#include <Struct/UseFull.h>
+
 #include "Icon/OPPOSans-H.h"
 #include "Icon/Icon.h"
 #include "Icon/Iconcpp.h"
 #include "Icon/Font.h"
+
+#include <Struct/RamaModz_Engine.h>
+
+
 
 inline static bool g_IsSetup = false;
 inline int prevWidth, prevHeight;
@@ -32,6 +36,46 @@ float density = -1;
 
 ImFont *font;
 
+inline void SetupImgui() {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+
+   
+    io.DisplaySize = ImVec2((float)g_GlWidth, (float)g_GlHeight);
+   
+     
+    ImGui::StyleColorsDark();
+    
+    
+    ImGui_ImplOpenGL3_Init("#version 300 es");
+    
+    
+    static const ImWchar icons_ranges[] = { 0xf000, 0xf3ff, 0 };
+            ImFontConfig icons_config;
+   
+           ImFontConfig CustomFont;
+            CustomFont.FontDataOwnedByAtlas = false;
+
+            icons_config.MergeMode = true;
+            icons_config.PixelSnapH = true;
+            icons_config.OversampleH = 2.5;
+            icons_config.OversampleV = 2.5;
+            
+            
+            io.Fonts->AddFontFromMemoryTTF(const_cast<std::uint8_t*>(Custom), sizeof(Custom), 20.f, &CustomFont);
+            io.Fonts->AddFontFromMemoryCompressedTTF(font_awesome_data, font_awesome_size, 20.0f, &icons_config, icons_ranges);
+
+            ImFontConfig cfg;
+            cfg.SizePixels = ((float) density / 20.0f);
+            io.Fonts->AddFontDefault(&cfg);
+
+    // Arbitrary scale-up
+    ImGui::GetStyle().ScaleAllSizes(3.0f);
+}
+
+
+/*
 void SetupImgui() {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -63,7 +107,7 @@ void SetupImgui() {
     ImGui::GetStyle().ScaleAllSizes(3.0f);
 }
 
-
+*/
 
 
 

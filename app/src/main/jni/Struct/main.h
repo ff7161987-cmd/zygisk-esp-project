@@ -13,7 +13,10 @@ struct cfg {
         bool Box;
         bool Line;
         bool Health;
-        bool Distance;
+        bool RamaMods;
+        bool LineRgb;
+        bool Hexagono;
+        bool Distancia;
         bool IsName;
         bool Path;       
         bool Esp360;
@@ -37,4 +40,4 @@ inline T setFieldValue(void *instance,ulong offset, T value) {
 void menu();
 void *getRealAddr(ulong offset);
 
-#endif //MAIN_H
+#endif //RAMA MODZ
