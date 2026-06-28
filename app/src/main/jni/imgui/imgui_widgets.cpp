@@ -3718,10 +3718,10 @@ static bool STB_TEXTEDIT_INSERTCHARS(ImGuiInputTextState* obj, int pos, const Im
 #include "imstb_textedit.h"
 
 // stb_textedit internally allows for a single undo record to do addition and deletion, but somehow, calling
-// the ImStb::stb_textedit_paste() function creates two separate records, so we perform it manually. (FIXME: Report to nothings/stb?)
+// the stb_textedit_paste() function creates two separate records, so we perform it manually. (FIXME: Report to nothings/stb?)
 static void stb_textedit_replace(ImGuiInputTextState* str, STB_TexteditState* state, const STB_TEXTEDIT_CHARTYPE* text, int text_len)
 {
-    ImStb::stb_text_makeundo_replace(str, state, 0, str->CurLenW, text_len);
+    stb_text_makeundo_replace(str, state, 0, str->CurLenW, text_len);
     ImStb::STB_TEXTEDIT_DELETECHARS(str, 0, str->CurLenW);
     state->cursor = state->select_start = state->select_end = 0;
     if (text_len <= 0)
@@ -3736,10 +3736,11 @@ static void stb_textedit_replace(ImGuiInputTextState* str, STB_TexteditState* st
 }
 
 } // namespace ImStb
+using namespace ImStb;
 
 void ImGuiInputTextState::OnKeyPressed(int key)
 {
-    ImStb::stb_textedit_key(this, &Stb, key);
+    stb_textedit_key(this, &Stb, key);
     CursorFollow = true;
     CursorAnimReset();
 }
@@ -3930,7 +3931,7 @@ static void InputTextReconcileUndoStateAfterUserCallback(ImGuiInputTextState* st
     const int insert_len = new_last_diff - first_diff + 1;
     const int delete_len = old_last_diff - first_diff + 1;
     if (insert_len > 0 || delete_len > 0)
-        if (STB_TEXTEDIT_CHARTYPE* p = ImStb::stb_text_createundo(&state->Stb.undostate, first_diff, delete_len, insert_len))
+        if (STB_TEXTEDIT_CHARTYPE* p = stb_text_createundo(&state->Stb.undostate, first_diff, delete_len, insert_len))
             for (int i = 0; i < delete_len; i++)
                 p[i] = ImStb::STB_TEXTEDIT_GETCHAR(state, first_diff + i);
 }
@@ -4079,7 +4080,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         else
         {
             state->ScrollX = 0.0f;
-            ImStb::stb_textedit_initialize_state(&state->Stb, !is_multiline);
+            stb_textedit_initialize_state(&state->Stb, !is_multiline);
         }
 
         if (!is_multiline)
@@ -4195,7 +4196,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         }
         else if (hovered && io.MouseClickedCount[0] >= 2 && !io.KeyShift)
         {
-            ImStb::stb_textedit_click(state, &state->Stb, mouse_x, mouse_y);
+            stb_textedit_click(state, &state->Stb, mouse_x, mouse_y);
             const int multiclick_count = (io.MouseClickedCount[0] - 2);
             if ((multiclick_count % 2) == 0)
             {
@@ -4203,14 +4204,14 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
                 // We always use the "Mac" word advance for double-click select vs CTRL+Right which use the platform dependent variant:
                 // FIXME: There are likely many ways to improve this behavior, but there's no "right" behavior (depends on use-case, software, OS)
                 const bool is_bol = (state->Stb.cursor == 0) || ImStb::STB_TEXTEDIT_GETCHAR(state, state->Stb.cursor - 1) == '\n';
-                if (ImStb::STB_TEXT_HAS_SELECTION(&state->Stb) || !is_bol)
+                if (STB_TEXT_HAS_SELECTION(&state->Stb) || !is_bol)
                     state->OnKeyPressed(STB_TEXTEDIT_K_WORDLEFT);
                 //state->OnKeyPressed(STB_TEXTEDIT_K_WORDRIGHT | STB_TEXTEDIT_K_SHIFT);
-                if (!ImStb::STB_TEXT_HAS_SELECTION(&state->Stb))
-                    ImStb::stb_textedit_prep_selection_at_cursor(&state->Stb);
-                state->Stb.cursor = ImStb::STB_TEXTEDIT_MOVEWORDRIGHT_MAC(state, state->Stb.cursor);
+                if (!STB_TEXT_HAS_SELECTION(&state->Stb))
+                    stb_textedit_prep_selection_at_cursor(&state->Stb);
+                state->Stb.cursor = STB_TEXTEDIT_MOVEWORDRIGHT_MAC(state, state->Stb.cursor);
                 state->Stb.select_end = state->Stb.cursor;
-                ImStb::stb_textedit_clamp(state, &state->Stb);
+                stb_textedit_clamp(state, &state->Stb);
             }
             else
             {
@@ -4233,15 +4234,15 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
             if (hovered)
             {
                 if (io.KeyShift)
-                    ImStb::stb_textedit_drag(state, &state->Stb, mouse_x, mouse_y);
+                    stb_textedit_drag(state, &state->Stb, mouse_x, mouse_y);
                 else
-                    ImStb::stb_textedit_click(state, &state->Stb, mouse_x, mouse_y);
+                    stb_textedit_click(state, &state->Stb, mouse_x, mouse_y);
                 state->CursorAnimReset();
             }
         }
         else if (io.MouseDown[0] && !state->SelectedAllMouseLock && (io.MouseDelta.x != 0.0f || io.MouseDelta.y != 0.0f))
         {
-            ImStb::stb_textedit_drag(state, &state->Stb, mouse_x, mouse_y);
+            stb_textedit_drag(state, &state->Stb, mouse_x, mouse_y);
             state->CursorAnimReset();
             state->CursorFollow = true;
         }
@@ -4396,7 +4397,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
                 if (!state->HasSelection())
                     state->SelectAll();
                 state->CursorFollow = true;
-                ImStb::stb_textedit_cut(state, &state->Stb);
+                stb_textedit_cut(state, &state->Stb);
             }
         }
         else if (is_paste)
@@ -4420,7 +4421,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
                 clipboard_filtered[clipboard_filtered_len] = 0;
                 if (clipboard_filtered_len > 0) // If everything was filtered, ignore the pasting operation
                 {
-                    ImStb::stb_textedit_paste(state, &state->Stb, clipboard_filtered, clipboard_filtered_len);
+                    stb_textedit_paste(state, &state->Stb, clipboard_filtered, clipboard_filtered_len);
                     state->CursorFollow = true;
                 }
                 MemFree(clipboard_filtered);
@@ -4445,7 +4446,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
                 apply_new_text = "";
                 apply_new_text_length = 0;
                 STB_TEXTEDIT_CHARTYPE empty_string;
-                ImStb::stb_textedit_replace(state, &state->Stb, &empty_string, 0);
+                stb_textedit_replace(state, &state->Stb, &empty_string, 0);
             }
             else if (strcmp(buf, state->InitialTextA.Data) != 0)
             {
@@ -4459,7 +4460,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
                     w_text.resize(ImTextCountCharsFromUtf8(apply_new_text, apply_new_text + apply_new_text_length) + 1);
                     ImTextStrFromUtf8(w_text.Data, w_text.Size, apply_new_text, apply_new_text + apply_new_text_length);
                 }
-                ImStb::stb_textedit_replace(state, &state->Stb, w_text.Data, (apply_new_text_length > 0) ? (w_text.Size - 1) : 0);
+                stb_textedit_replace(state, &state->Stb, w_text.Data, (apply_new_text_length > 0) ? (w_text.Size - 1) : 0);
             }
         }
 
