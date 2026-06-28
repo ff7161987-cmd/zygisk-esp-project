@@ -3714,6 +3714,8 @@ static bool STB_TEXTEDIT_INSERTCHARS(ImGuiInputTextState* obj, int pos, const Im
 #define STB_TEXTEDIT_K_PGDOWN       0x20000F // keyboard input to move cursor down a page
 #define STB_TEXTEDIT_K_SHIFT        0x400000
 
+} // namespace ImStb
+
 #define STB_TEXTEDIT_IMPLEMENTATION
 #include "imstb_textedit.h"
 
@@ -3735,8 +3737,6 @@ static void stb_textedit_replace(ImGuiInputTextState* str, STB_TexteditState* st
     IM_ASSERT(0); // Failed to insert character, normally shouldn't happen because of how we currently use stb_textedit_replace()
 }
 
-} // namespace ImStb
-using namespace ImStb;
 
 void ImGuiInputTextState::OnKeyPressed(int key)
 {
