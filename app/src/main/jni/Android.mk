@@ -25,7 +25,8 @@ LOCAL_C_INCLUDES       := $(LOCAL_PATH) \
                           $(LOCAL_PATH)/imgui \
                           $(LOCAL_PATH)/KittyMemory \
                           $(LOCAL_PATH)/Unity \
-                          $(LOCAL_PATH)/Struct
+                          $(LOCAL_PATH)/Struct \
+                          $(LOCAL_PATH)/RamaModz/Tools/curl/openssl-android-armeabi-v7a/include
 
 # Explicitly list source files to avoid ODR violations from wildcards
 LOCAL_SRC_FILES := Main.cpp \
@@ -47,7 +48,6 @@ LOCAL_SRC_FILES := Main.cpp \
                    KittyMemory/MemoryBackup.cpp \
                    KittyMemory/KittyUtils.cpp \
                    KittyMemory/KittyArm64.cpp \
-                   RamaModz/IL2CppSDKGenerator/Il2Cpp.cpp \
                    Unity/Tools.cpp \
                    Unity/MonoString.cpp \
                    Unity/Il2Cpp.cpp
