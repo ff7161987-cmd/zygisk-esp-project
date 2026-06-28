@@ -101,6 +101,9 @@ void SetElegantBlackAndBlueTheme()
 }
 
 uintptr_t il2cpp_base = 0;
+int g_GlWidth = 0, g_GlHeight = 0;
+bool g_IsSetup = false;
+bool g_HackAttached = false;
 void *getRealAddr(ulong offset) {
     return reinterpret_cast<void*>(il2cpp_base + offset);
 }
@@ -149,7 +152,7 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
         }
     }
     
-    DrawESP((float)g_GlWidth, (float)g_GlHeight);
+    if (g_HackAttached) DrawESP((float)g_GlWidth, (float)g_GlHeight);
     ImGui::SetNextWindowSize(ImVec2((float)g_GlWidth * 0.34f, (float)g_GlHeight * 0.54f), ImGuiCond_Once);
     if (ImGui::Begin("MEOK CHEATS ZYGISK", 0, ImGuiWindowFlags_NoBringToFrontOnFocus)) {
         if (ImGui::BeginTabBar("Tab", ImGuiTabBarFlags_FittingPolicyScroll)) {
@@ -198,12 +201,48 @@ void StartGUI() {
     }
 }
 
+
 void hack_thread(pid_t pid) {
-    for (int i = 0; i < 20; i++) {
+    LOGD("Hack thread started");
+    for (int i = 0; i < 30; i++) {
         il2cpp_base = get_module_base(pid, "libil2cpp.so");
         if (il2cpp_base != 0) break;
         sleep(2);
     }
+    if (il2cpp_base == 0) {
+        LOGD("libil2cpp.so not found");
+        return;
+    }
+    
+    // Esperar o jogo inicializar os metadados do Il2Cpp
+    sleep(25);
+    LOGD("Attaching Il2Cpp");
+    Il2CppAttach();
+    
+    // Hook com verificação de segurança
+    void* addr_bypass = (void*)Il2CppGetMethodOffset("Assembly-CSharp.dll", "COW.GamePlay", "Player", "UpdateRotation", 2);
+    if (addr_bypass) {
+        DobbyHook(addr_bypass, (void *) Modify_Bypass_RamaModz, (void **)&ori_bypass_ramamodz);
+        LOGD("Bypass Hooked");
+    }
+
+    void* addr_camera = (void*)Il2CppGetMethodOffset("Assembly-CSharp.dll", "COW.GamePlay", "FollowCamera", "get_OffsetForNormal", 0);
+    if (addr_camera) {
+        DobbyHook(addr_camera, (void *)_GetCameraHeightRateValue, (void **)&GetCameraHeightRateValue);
+        LOGD("Camera Hooked");
+    }
+
+    void* addr_guest = (void*)Il2CppGetMethodOffset("Assembly-CSharp.dll", "COW", "GameConfig", "get_ResetGuest", 0);
+    if (addr_guest) {
+        DobbyHook(addr_guest, (void *)_ResetGuest, (void **)&ResetGuest);
+        LOGD("Guest Hooked");
+    }
+
+    // Iniciar GUI por último
+    StartGUI();
+    g_HackAttached = true;
+}
+
     if (il2cpp_base == 0) return;
     sleep(10);
     Il2CppAttach();
@@ -213,6 +252,7 @@ void hack_thread(pid_t pid) {
     DobbyHook((void*)Il2CppGetMethodOffset("Assembly-CSharp.dll", "COW", "GameConfig", "get_ResetGuest", 0), (void *)_ResetGuest, (void **)&ResetGuest);
     
     StartGUI();
+    g_HackAttached = true;
 }
 
 void hack() {
