@@ -1,4 +1,3 @@
-#pragma once
 #ifndef FA_SOLID_H
 #define FA_SOLID_H
 // File: 'fa-solid-900.ttf' (394832 bytes)

@@ -1,4 +1,3 @@
-#pragma once
 #ifndef SHANTELL_SANS_H
 #define SHANTELL_SANS_H
 // File: 'static/ShantellSans-Regular.ttf' (394252 bytes)

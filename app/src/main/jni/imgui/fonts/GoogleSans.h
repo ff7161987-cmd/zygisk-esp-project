@@ -1,4 +1,3 @@
-#pragma once
 // File: 'google_sans.ttf' (119984 bytes)
 // Exported using binary_to_compressed_c.cpp
 static const unsigned int GoogleSans_compressed_size = 77214;

@@ -1,7 +1,7 @@
 #pragma once
 #include "imgui_internal.h"
 
-inline void Toggle(const char* str_id, bool* v)
+void Toggle(const char* str_id, bool* v)
 {
     ImVec2 p = ImGui::GetCursorScreenPos();
     ImDrawList* draw_list = ImGui::GetWindowDrawList();

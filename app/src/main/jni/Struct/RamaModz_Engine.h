@@ -81,7 +81,7 @@ void DrawCircleHealth(ImVec2 position, int health, int max_health, float radius)
         healthColor = IM_COL32(180, 45, 45, 255);
     }
     ImGui::GetForegroundDrawList()->PathArcTo(position, radius, (-(a_max / 4.0f)) + (a_max / max_health) * (max_health - health), a_max - (a_max / 4.0f));
-    ImGui::GetForegroundDrawList()->PathStroke(healthColor, 4.0f, ImDrawFlags_None);
+    ImGui::GetForegroundDrawList()->PathStroke(healthColor, ImDrawFlags_None, 4.0f);
 }
 
 
@@ -273,7 +273,7 @@ if (Enable && UNIVERSAL_READY) {
         void* current_Match = Curent_Match();
         void* local_player = GetLocalPlayer(current_Match);
 
-        if (local_player && current_Match) {
+        if (local_player && current_Match && UNIVERSAL_READY) {
             if (UNIVERSAL_LIST_OFFSET == (size_t)-1) return; auto* players_ptr = (void**)((long)current_Match + UNIVERSAL_LIST_OFFSET); if (!players_ptr || !*players_ptr) return; auto* players = *(monoDictionary<uint8_t*, void**>**)players_ptr;
             void* camera = Camera_main();
 
@@ -377,7 +377,7 @@ if (Config.ESP.RamaMods) {
     std::string distText = std::to_string((int)distance) + "M";
     ImFont* font = ImGui::GetFont();
     float fontScale = 0.7f;
-    float fontSize = ImGui::GetFontSize() * fontScale;
+    float fontSize = font->FontSize * fontScale;
     ImVec2 teamSize = ImGui::CalcTextSize(teamText.c_str());
     teamSize.x *= fontScale;
     teamSize.y *= fontScale;

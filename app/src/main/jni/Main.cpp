@@ -79,7 +79,7 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
     ImGuiIO &io = ImGui::GetIO();
     SetElegantBlackAndBlueTheme();
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplAndroid_NewFrame();
+    ImGui_ImplAndroid_NewFrame(g_GlWidth, g_GlHeight);
     ImGui::NewFrame();
     
     if (Class_Input__get_touchCount && Class_Input__GetTouch) {

@@ -2,13 +2,11 @@
 // This needs to be used along with the OpenGL 3 Renderer (imgui_impl_opengl3)
 
 // Implemented features:
-//  [X] Platform: Keyboard support. Since 1.87 we are using the io.AddKeyEvent() function. Pass ImGuiKey values to all key functions e.g. ImGui::IsKeyPressed(ImGuiKey_Space). [Legacy AKEYCODE_* values are obsolete since 1.87 and not supported since 1.91.5]
-//  [X] Platform: Mouse support. Can discriminate Mouse/TouchScreen/Pen.
-// Missing features or Issues:
+//  [X] Platform: Keyboard support. Since 1.87 we are using the io.AddKeyEvent() function. Pass ImGuiKey values to all key functions e.g. ImGui::IsKeyPressed(ImGuiKey_Space). [Legacy AKEYCODE_* values will also be supported unless IMGUI_DISABLE_OBSOLETE_KEYIO is set]
+// Missing features:
 //  [ ] Platform: Clipboard support.
-//  [ ] Platform: Gamepad support.
-//  [ ] Platform: Mouse cursor shape and visibility (ImGuiBackendFlags_HasMouseCursors). Disable with 'io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange'. FIXME: Check if this is even possible with Android.
-//  [ ] Platform: Multi-viewport support (multiple windows). Not meaningful on Android.
+//  [ ] Platform: Gamepad support. Enable with 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad'.
+//  [ ] Platform: Mouse cursor shape and visibility. Disable with 'io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange'. FIXME: Check if this is even possible with Android.
 // Important:
 //  - Consider using SDL or GLFW backend on Android, which will be more full-featured than this.
 //  - FIXME: On-screen keyboard currently needs to be enabled by the application (see examples/ and issue #3446)
@@ -16,11 +14,8 @@
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
 // Prefer including the entire imgui/ repository into your project (either as a copy or as a submodule), and only build the backends you need.
-// Learn about Dear ImGui:
-// - FAQ                  https://dearimgui.com/faq
-// - Getting Started      https://dearimgui.com/getting-started
-// - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
-// - Introduction, links and more at the top of imgui.cpp
+// If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
+// Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
@@ -31,7 +26,6 @@
 //  2021-03-04: Initial version.
 
 #include "imgui.h"
-#ifndef IMGUI_DISABLE
 #include "imgui_impl_android.h"
 #include <time.h>
 #include <android/native_window.h>
@@ -157,7 +151,7 @@ static ImGuiKey ImGui_ImplAndroid_KeyCodeToImGuiKey(int32_t key_code)
     }
 }
 
-int32_t ImGui_ImplAndroid_HandleInputEvent(const AInputEvent* input_event)
+int32_t ImGui_ImplAndroid_HandleInputEvent(AInputEvent* input_event)
 {
     ImGuiIO& io = ImGui::GetIO();
     int32_t event_type = AInputEvent_getType(input_event);
@@ -184,7 +178,7 @@ int32_t ImGui_ImplAndroid_HandleInputEvent(const AInputEvent* input_event)
         case AKEY_EVENT_ACTION_UP:
         {
             ImGuiKey key = ImGui_ImplAndroid_KeyCodeToImGuiKey(event_key_code);
-            if (key != ImGuiKey_None)
+            if (key != ImGuiKey_None && (event_action == AKEY_EVENT_ACTION_DOWN || event_action == AKEY_EVENT_ACTION_UP))
             {
                 io.AddKeyEvent(key, event_action == AKEY_EVENT_ACTION_DOWN);
                 io.SetKeyEventNativeData(key, event_key_code, event_scan_code);
@@ -202,47 +196,29 @@ int32_t ImGui_ImplAndroid_HandleInputEvent(const AInputEvent* input_event)
         int32_t event_action = AMotionEvent_getAction(input_event);
         int32_t event_pointer_index = (event_action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
         event_action &= AMOTION_EVENT_ACTION_MASK;
-
-        switch (AMotionEvent_getToolType(input_event, event_pointer_index))
-        {
-        case AMOTION_EVENT_TOOL_TYPE_MOUSE:
-            io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-            break;
-        case AMOTION_EVENT_TOOL_TYPE_STYLUS:
-        case AMOTION_EVENT_TOOL_TYPE_ERASER:
-            io.AddMouseSourceEvent(ImGuiMouseSource_Pen);
-            break;
-        case AMOTION_EVENT_TOOL_TYPE_FINGER:
-        default:
-            io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);
-            break;
-        }
-
         switch (event_action)
         {
         case AMOTION_EVENT_ACTION_DOWN:
         case AMOTION_EVENT_ACTION_UP:
-        {
             // Physical mouse buttons (and probably other physical devices) also invoke the actions AMOTION_EVENT_ACTION_DOWN/_UP,
             // but we have to process them separately to identify the actual button pressed. This is done below via
             // AMOTION_EVENT_ACTION_BUTTON_PRESS/_RELEASE. Here, we only process "FINGER" input (and "UNKNOWN", as a fallback).
-            int tool_type = AMotionEvent_getToolType(input_event, event_pointer_index);
-            if (tool_type == AMOTION_EVENT_TOOL_TYPE_FINGER || tool_type == AMOTION_EVENT_TOOL_TYPE_UNKNOWN)
+            if((AMotionEvent_getToolType(input_event, event_pointer_index) == AMOTION_EVENT_TOOL_TYPE_FINGER)
+            || (AMotionEvent_getToolType(input_event, event_pointer_index) == AMOTION_EVENT_TOOL_TYPE_UNKNOWN))
             {
                 io.AddMousePosEvent(AMotionEvent_getX(input_event, event_pointer_index), AMotionEvent_getY(input_event, event_pointer_index));
                 io.AddMouseButtonEvent(0, event_action == AMOTION_EVENT_ACTION_DOWN);
             }
             break;
-        }
         case AMOTION_EVENT_ACTION_BUTTON_PRESS:
         case AMOTION_EVENT_ACTION_BUTTON_RELEASE:
-        {
-            int32_t button_state = AMotionEvent_getButtonState(input_event);
-            io.AddMouseButtonEvent(0, (button_state & AMOTION_EVENT_BUTTON_PRIMARY) != 0);
-            io.AddMouseButtonEvent(1, (button_state & AMOTION_EVENT_BUTTON_SECONDARY) != 0);
-            io.AddMouseButtonEvent(2, (button_state & AMOTION_EVENT_BUTTON_TERTIARY) != 0);
+            {
+                int32_t button_state = AMotionEvent_getButtonState(input_event);
+                io.AddMouseButtonEvent(0, (button_state & AMOTION_EVENT_BUTTON_PRIMARY) != 0);
+                io.AddMouseButtonEvent(1, (button_state & AMOTION_EVENT_BUTTON_SECONDARY) != 0);
+                io.AddMouseButtonEvent(2, (button_state & AMOTION_EVENT_BUTTON_TERTIARY) != 0);
+            }
             break;
-        }
         case AMOTION_EVENT_ACTION_HOVER_MOVE: // Hovering: Tool moves while NOT pressed (such as a physical mouse)
         case AMOTION_EVENT_ACTION_MOVE:       // Touch pointer moves while DOWN
             io.AddMousePosEvent(AMotionEvent_getX(input_event, event_pointer_index), AMotionEvent_getY(input_event, event_pointer_index));
@@ -262,10 +238,25 @@ int32_t ImGui_ImplAndroid_HandleInputEvent(const AInputEvent* input_event)
     return 0;
 }
 
+int32_t ImGui_ImplAndroid_HandleInputEvent(int x, int y, int type)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    switch (type)
+    {
+        case 0:
+            io.MouseDown[0] = true;
+            break;
+        case 1:
+            io.MouseDown[0] = false;
+            break;
+    }
+    io.MousePos = ImVec2(x, y);
+    return 0;
+}
+
+
 bool ImGui_ImplAndroid_Init(ANativeWindow* window)
 {
-    IMGUI_CHECKVERSION();
-
     g_Window = window;
     g_Time = 0.0;
 
@@ -278,8 +269,6 @@ bool ImGui_ImplAndroid_Init(ANativeWindow* window)
 
 void ImGui_ImplAndroid_Shutdown()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    io.BackendPlatformName = nullptr;
 }
 
 void ImGui_ImplAndroid_NewFrame()
@@ -304,6 +293,24 @@ void ImGui_ImplAndroid_NewFrame()
     g_Time = current_time;
 }
 
-//-----------------------------------------------------------------------------
+void ImGui_ImplAndroid_NewFrame(int width, int height)
+{
+    ImGuiIO& io = ImGui::GetIO();
 
-#endif // #ifndef IMGUI_DISABLE
+    // Setup display size (every frame to accommodate for window resizing)
+    int32_t window_width = (int32_t)width;
+    int32_t window_height = (int32_t)height;
+    int display_width = window_width;
+    int display_height = window_height;
+
+    io.DisplaySize = ImVec2((float)window_width, (float)window_height);
+    if (window_width > 0 && window_height > 0)
+        io.DisplayFramebufferScale = ImVec2((float)display_width / window_width, (float)display_height / window_height);
+
+    // Setup time step
+    struct timespec current_timespec;
+    clock_gettime(CLOCK_MONOTONIC, &current_timespec);
+    double current_time = (double)(current_timespec.tv_sec) + (current_timespec.tv_nsec / 1000000000.0);
+    io.DeltaTime = g_Time > 0.0 ? (float)(current_time - g_Time) : (float)(1.0f / 60.0f);
+    g_Time = current_time;
+}
