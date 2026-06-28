@@ -268,7 +268,7 @@ if (closestEnemy != NULL && LocalPlayer != NULL && CurrentMatch != NULL) {
     
 }
 }
-if (Enable) {        
+if (Enable && UNIVERSAL_READY) {        
         int enemyIndex = 0; 
         void* current_Match = Curent_Match();
         void* local_player = GetLocalPlayer(current_Match);

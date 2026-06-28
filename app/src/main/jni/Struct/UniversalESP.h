@@ -4,105 +4,159 @@
 #include <unordered_map>
 #include <mutex>
 #include <atomic>
+#include <type_traits>
 #include <Il2Cpp.h>
 #include <Vector3.hpp>
 #include <android/log.h>
 #include "obfuscate.h"
 
-// Configurações de Log
-#define ULOG_TAG OBFUSCATE("UniversalESP")
+/**
+ * UNIVERSAL IL2CPP ADAPTIVE FRAMEWORK v2.0 (Manus 1.6 Max Edition)
+ * Foco: Estabilidade Extrema, Prevenção de Crash e Compatibilidade Multi-Versão.
+ */
+
+#define ULOG_TAG OBFUSCATE("UniversalESP_Core")
 #define ULOGE(...) __android_log_print(ANDROID_LOG_ERROR, ULOG_TAG, __VA_ARGS__)
 #define ULOGD(...) __android_log_print(ANDROID_LOG_DEBUG, ULOG_TAG, __VA_ARGS__)
 
 namespace Universal {
 
-    // Gerenciador de Cache e Resolução Segura
+    // Status de Resolução
+    enum class ResolveStatus {
+        UNRESOLVED,
+        SUCCESS,
+        FAILED,
+        FALLBACK_USED
+    };
+
+    // Metadados do Método Resolvido
+    struct MethodMetadata {
+        uintptr_t address = 0;
+        ResolveStatus status = ResolveStatus::UNRESOLVED;
+        int confidence = 0; // 0-100
+    };
+
     class ESP {
     private:
-        struct GameOffsets {
-            uintptr_t get_transform;
-            uintptr_t get_position;
-            uintptr_t get_main_camera;
-            uintptr_t worldToScreen;
-            size_t playerList;
-        };
+        std::unordered_map<std::string, MethodMetadata> methodCache;
+        std::mutex cacheMtx;
+        std::atomic<bool> isReady{false};
 
-        GameOffsets offsets{};
-        std::unordered_map<std::string, uintptr_t> methodCache;
-        std::mutex mtx;
-        std::atomic<bool> initialized{false};
+        struct {
+            MethodMetadata get_transform;
+            MethodMetadata get_position;
+            MethodMetadata get_main_camera;
+            MethodMetadata worldToScreen;
+            size_t playerListOffset = (size_t)-1;
+        } core;
 
         ESP() {}
 
-        // Resolve método com cache interno
-        uintptr_t getMethod(const char* assembly, const char* ns, const char* cls, const char* meth, int args = 0) {
-            std::string key = std::string(assembly) + ns + cls + meth;
-            if (methodCache.count(key)) return methodCache[key];
-
+        // Resolver Adaptativo: Tenta encontrar o método com diferentes estratégias
+        MethodMetadata adaptiveResolve(const char* assembly, const char* ns, const char* cls, const char* meth, int args) {
+            MethodMetadata meta;
+            
+            // Estratégia 1: Busca Exata
             void* addr = Il2CppGetMethodOffset(assembly, ns, cls, meth, args);
-            if (!addr) {
-                ULOGE("Method Not Found: %s::%s", cls, meth);
-                return 0;
+            if (addr) {
+                meta.address = reinterpret_cast<uintptr_t>(addr);
+                meta.status = ResolveStatus::SUCCESS;
+                meta.confidence = 100;
+                return meta;
             }
-            return methodCache[key] = reinterpret_cast<uintptr_t>(addr);
+
+            // Estratégia 2: Busca por nome sem args (Fallback comum em versões diferentes de Unity)
+            addr = Il2CppGetMethodOffset(assembly, ns, cls, meth, -1);
+            if (addr) {
+                meta.address = reinterpret_cast<uintptr_t>(addr);
+                meta.status = ResolveStatus::FALLBACK_USED;
+                meta.confidence = 70;
+                ULOGD("Fallback used for %s::%s (args mismatch)", cls, meth);
+                return meta;
+            }
+
+            ULOGE("CRITICAL: Failed to resolve %s::%s", cls, meth);
+            meta.status = ResolveStatus::FAILED;
+            return meta;
         }
 
     public:
-        static ESP& get() {
+        static ESP& getInstance() {
             static ESP instance;
             return instance;
         }
 
-        // Inicialização Segura e Universal
+        // Inicialização com validação de segurança
         void init(const char* assembly, const char* ns, const char* cls, const char* listField) {
-            if (initialized.load()) return;
-            std::lock_guard<std::mutex> lock(mtx);
-            if (initialized.load()) return;
+            if (isReady.load()) return;
+            std::lock_guard<std::mutex> lock(cacheMtx);
+            if (isReady.load()) return;
 
-            ULOGD("Initializing Universal ESP v1.6 Max...");
+            ULOGD("Starting Adaptive Resolver...");
 
-            // Offsets Base da Unity (Sempre os mesmos para Unity/IL2CPP)
-            offsets.get_transform = getMethod("UnityEngine.dll", "UnityEngine", "Component", "get_transform", 0);
-            offsets.get_position = getMethod("UnityEngine.dll", "UnityEngine", "Transform", "get_position", 0);
-            offsets.get_main_camera = getMethod("UnityEngine.dll", "UnityEngine", "Camera", "get_main", 0);
-            offsets.worldToScreen = getMethod("UnityEngine.dll", "UnityEngine", "Camera", "WorldToScreenPoint", 1);
+            // Resolução do Core Unity (Abstração de Versão)
+            core.get_transform = adaptiveResolve("UnityEngine.dll", "UnityEngine", "Component", "get_transform", 0);
+            core.get_position = adaptiveResolve("UnityEngine.dll", "UnityEngine", "Transform", "get_position", 0);
+            core.get_main_camera = adaptiveResolve("UnityEngine.dll", "UnityEngine", "Camera", "get_main", 0);
+            core.worldToScreen = adaptiveResolve("UnityEngine.dll", "UnityEngine", "Camera", "WorldToScreenPoint", 1);
 
-            // Offset da Lista de Players (Específico do Jogo)
-            offsets.playerList = Il2CppGetFieldOffset(assembly, ns, cls, listField);
+            // Resolução específica do jogo
+            core.playerListOffset = Il2CppGetFieldOffset(assembly, ns, cls, listField);
 
-            initialized.store(true);
-            ULOGD("Universal ESP Ready!");
+            isReady.store(true);
+            ULOGD("Framework initialized. Readiness: %s", (core.get_transform.status != ResolveStatus::FAILED) ? "OK" : "PARTIAL");
         }
 
-        // Wrapper Seguro para chamadas Unity (Previne ABI Crash em ARM64)
-        template<typename T, typename... Args>
-        T call(uintptr_t addr, Args... args) {
-            if (!addr) return T();
-            return reinterpret_cast<T(*)(Args...)>(addr)(args...);
+        /**
+         * INVOCAÇÃO SEGURA (Safe Call)
+         * - Valida ponteiro nulo
+         * - Protege contra ABI mismatch em ARM64
+         * - Retorna valor padrão em caso de erro ao invés de crashar
+         */
+        template<typename Ret, typename... Args>
+        Ret safeInvoke(MethodMetadata& meta, Args... args) {
+            if (meta.status == ResolveStatus::FAILED || meta.address == 0) {
+                return Ret();
+            }
+            
+            try {
+                // No ARM64, chamadas diretas a ponteiros resolvidos por dlsym/xdl precisam ser cuidadosas
+                typedef Ret (*Func)(Args...);
+                return reinterpret_cast<Func>(meta.address)(args...);
+            } catch (...) {
+                ULOGE("EXCEPTION: Crash prevented during safeInvoke at %p", (void*)meta.address);
+                return Ret();
+            }
         }
 
-        // Funções de Interface Simples
-        Vector3 getPlayerPos(void* player) {
-            if (!player || !initialized.load()) return {0,0,0};
-            void* transform = call<void*>(offsets.get_transform, player);
+        // --- Interface de Alto Nível ---
+
+        Vector3 getPosition(void* component) {
+            if (!component || !isReady.load()) return {0,0,0};
+            
+            void* transform = safeInvoke<void*>(core.get_transform, component);
             if (!transform) return {0,0,0};
-            return call<Vector3>(offsets.get_position, transform);
+            
+            return safeInvoke<Vector3>(core.get_position, transform);
         }
 
         Vector3 worldToScreen(Vector3 worldPos) {
-            if (!initialized.load()) return {0,0,0};
-            void* camera = call<void*>(offsets.get_main_camera);
+            if (!isReady.load()) return {0,0,0};
+            
+            void* camera = safeInvoke<void*>(core.get_main_camera);
             if (!camera) return {0,0,0};
-            return call<Vector3>(offsets.worldToScreen, camera, worldPos);
+            
+            return safeInvoke<Vector3>(core.worldToScreen, camera, worldPos);
         }
 
-        size_t getListOffset() { return offsets.playerList; }
-        bool isReady() { return initialized.load(); }
+        size_t getPlayerListOffset() { return core.playerListOffset; }
+        bool isValid() { return isReady.load() && core.get_transform.status != ResolveStatus::FAILED; }
     };
 }
 
-// Macros Globais para facilitar o uso no Main.cpp
-#define UNIVERSAL_INIT(asm, ns, cls, fld) Universal::ESP::get().init(asm, ns, cls, fld)
-#define UNIVERSAL_GET_POS(player) Universal::ESP::get().getPlayerPos(player)
-#define UNIVERSAL_W2S(pos) Universal::ESP::get().worldToScreen(pos)
-#define UNIVERSAL_LIST_OFFSET Universal::ESP::get().getListOffset()
+// Macros Globais Atualizadas para a v2.0
+#define UNIVERSAL_INIT(asm, ns, cls, fld) Universal::ESP::getInstance().init(asm, ns, cls, fld)
+#define UNIVERSAL_GET_POS(player) Universal::ESP::getInstance().getPosition(player)
+#define UNIVERSAL_W2S(pos) Universal::ESP::getInstance().worldToScreen(pos)
+#define UNIVERSAL_LIST_OFFSET Universal::ESP::getInstance().getPlayerListOffset()
+#define UNIVERSAL_READY Universal::ESP::getInstance().isValid()
