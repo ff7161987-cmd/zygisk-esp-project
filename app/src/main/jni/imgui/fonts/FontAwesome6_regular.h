@@ -1,3 +1,4 @@
+#pragma once
 #ifndef FA_REG_H
 #define FA_REG_H
 // File: 'fa-regular-400.ttf' (63728 bytes)

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef dobby_h
 #define dobby_h
 

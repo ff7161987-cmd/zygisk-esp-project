@@ -1,3 +1,4 @@
+#pragma once
 #if !defined(STR_ENC)
 #define STR_ENC
 

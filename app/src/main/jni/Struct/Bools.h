@@ -1,3 +1,4 @@
+#pragma once
 bool Enable;
 int AimCheck = 0;
 int AimType = 0;

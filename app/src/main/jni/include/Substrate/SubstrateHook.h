@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __SUBSTRATEHOOK_H__
 #define __SUBSTRATEHOOK_H__
 

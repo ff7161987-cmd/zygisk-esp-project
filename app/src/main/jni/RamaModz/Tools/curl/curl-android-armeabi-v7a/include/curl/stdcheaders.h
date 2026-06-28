@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __STDC_HEADERS_H
 #define __STDC_HEADERS_H
 /***************************************************************************

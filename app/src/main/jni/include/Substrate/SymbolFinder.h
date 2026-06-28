@@ -1,3 +1,4 @@
+#pragma once
 #ifndef SYMBOL_FINDER
 #define SYMBOL_FINDER
 

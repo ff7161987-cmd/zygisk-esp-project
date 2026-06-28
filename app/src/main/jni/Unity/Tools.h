@@ -1,3 +1,4 @@
+#pragma once
 #include <map>
 #include <jni.h>
 #include "dobby.h"

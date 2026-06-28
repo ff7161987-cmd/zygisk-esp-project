@@ -1,3 +1,4 @@
+#pragma once
 /* Cydia Substrate - Powerful Code Insertion Platform
  * Copyright (C) 2008-2011  Jay Freeman (saurik)
 */

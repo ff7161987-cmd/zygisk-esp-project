@@ -11,7 +11,7 @@
 #include "Struct/Gui.hpp"
 #include <Struct/main.h>
 #include "fonts/FontAwesome6_solid.h"
-#include "ImGui/Toggle.h"
+#include "Toggle.h"
 #include "zygisk.hpp"
 
 using zygisk::Api;
@@ -80,7 +80,7 @@ EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
             io.MousePos = ImVec2(touch.m_Position.fields.x, reverseY);
             
             // Persistência do estado de clique para evitar perda de input em baixo FPS
-            if (touch.m_Phase == TouchPhase::Began || touch.m_Phase == TouchPhase::Moved || touch.m_Phase == TouchPhase::Stationary) {
+            if (touch.m_Phase == (int32_t)TouchPhase::Began || touch.m_Phase == (int32_t)TouchPhase::Moved || touch.m_Phase == (int32_t)TouchPhase::Stationary) {
                 io.MouseDown[0] = true;
             } else {
                 io.MouseDown[0] = false;

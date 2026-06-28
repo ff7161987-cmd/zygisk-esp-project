@@ -1,3 +1,4 @@
+#pragma once
 #ifndef MONOSTRING_H
 #define MONOSTRING_H
 

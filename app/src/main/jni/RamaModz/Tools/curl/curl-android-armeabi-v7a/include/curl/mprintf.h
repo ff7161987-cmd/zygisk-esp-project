@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __CURL_MPRINTF_H
 #define __CURL_MPRINTF_H
 /***************************************************************************

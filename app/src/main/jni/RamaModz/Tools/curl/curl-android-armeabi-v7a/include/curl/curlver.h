@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __CURL_CURLVER_H
 #define __CURL_CURLVER_H
 /***************************************************************************

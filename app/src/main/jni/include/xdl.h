@@ -1,3 +1,4 @@
+#pragma once
 // Copyright (c) 2020-2021 HexHacking Team
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy

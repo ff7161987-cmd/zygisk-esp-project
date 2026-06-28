@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ESPMANAGER_H
 #define ESPMANAGER_H
 

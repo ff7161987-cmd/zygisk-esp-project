@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __CURL_CURLRULES_H
 #define __CURL_CURLRULES_H
 /***************************************************************************

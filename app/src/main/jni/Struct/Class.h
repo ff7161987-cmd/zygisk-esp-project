@@ -1,3 +1,4 @@
+#pragma once
 #include <Struct/main.h>
 #include <Struct/tools.hpp>
 #include <Unity/Unity.h>
@@ -11,23 +12,38 @@ struct Vvector3 {
     float x, y, z;
 };
 
-struct UnityEngine_Touch_Fields {
-    int m_FingerId;
-    Vvector3 m_Position;
-    Vvector3 m_RawPosition;
-    Vvector3 m_DeltaPosition;
-    float m_DeltaTime;
-    int m_TapCount;
-    int m_Phase;
-    int m_Type;
+struct UnityEngine_Vector2_Fields {
+    float x;
+    float y;
 };
 
-enum class TouchPhase {
+struct UnityEngine_Vector2_o {
+    UnityEngine_Vector2_Fields fields;
+};
+
+enum class TouchPhase : int32_t {
     Began = 0,
     Moved = 1,
     Stationary = 2,
     Ended = 3,
     Canceled = 4
+};
+
+struct UnityEngine_Touch_Fields {
+    int32_t m_FingerId;
+    struct UnityEngine_Vector2_o m_Position;
+    struct UnityEngine_Vector2_o m_RawPosition;
+    struct UnityEngine_Vector2_o m_PositionDelta;
+    float m_TimeDelta;
+    int32_t m_TapCount;
+    int32_t m_Phase;
+    int32_t m_Type;
+    float m_Pressure;
+    float m_maximumPossiblePressure;
+    float m_Radius;
+    float m_RadiusVariance;
+    float m_AltitudeAngle;
+    float m_AzimuthAngle;
 };
 
 // Unity Engine Offsets (Verified from Log)

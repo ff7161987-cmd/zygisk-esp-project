@@ -1,3 +1,4 @@
+#pragma once
 #ifndef __CURL_TYPECHECK_GCC_H
 #define __CURL_TYPECHECK_GCC_H
 /***************************************************************************
