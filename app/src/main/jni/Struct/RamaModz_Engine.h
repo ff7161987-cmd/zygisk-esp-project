@@ -81,7 +81,7 @@ void DrawCircleHealth(ImVec2 position, int health, int max_health, float radius)
         healthColor = IM_COL32(180, 45, 45, 255);
     }
     ImGui::GetForegroundDrawList()->PathArcTo(position, radius, (-(a_max / 4.0f)) + (a_max / max_health) * (max_health - health), a_max - (a_max / 4.0f));
-    ImGui::GetForegroundDrawList()->PathStroke(healthColor, ImDrawFlags_None, 4);
+    ImGui::GetForegroundDrawList()->PathStroke(healthColor, 4, ImDrawFlags_None);
 }
 
 
@@ -377,7 +377,7 @@ if (Config.ESP.RamaMods) {
     std::string distText = std::to_string((int)distance) + "M";
     ImFont* font = ImGui::GetFont();
     float fontScale = 0.7f;
-    float fontSize = font->FontSize * fontScale;
+    float fontSize = ImGui::GetFontSize() * fontScale;
     ImVec2 teamSize = ImGui::CalcTextSize(teamText.c_str());
     teamSize.x *= fontScale;
     teamSize.y *= fontScale;
