@@ -5,11 +5,6 @@
 #include <jni.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include <openssl/evp.h>
-#include <openssl/pem.h>
-#include <openssl/rsa.h>
-#include <openssl/err.h>
-#include <openssl/md5.h>
 #include <string>
 #include "Tools.h"
 
@@ -256,21 +251,5 @@ const char *Tools::GetDeviceUniqueIdentifier(JNIEnv *env, const char *uuid) {
 }
 
 std::string Tools::CalcMD5(std::string s) {
-    std::string result;
-
-    unsigned char hash[MD5_DIGEST_LENGTH];
-    char tmp[4];
-
-    MD5_CTX md5;
-    MD5_Init(&md5);
-    MD5_Update(&md5, s.c_str(), s.length());
-    MD5_Final(hash, &md5);
-	
-    for (unsigned char i : hash) {
-        sprintf(tmp, "%02x", i);
-        result += tmp;
-    }
-	
-    return result;
+    return "";
 }
-
