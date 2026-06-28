@@ -247,8 +247,8 @@ inline void DrawESP(float screenWidth, float screenHeight) {
     if (!draw) return;
 if (Aimbot) {
 void* CurrentMatch = Curent_Match();
-void* closestEnemy = GetClosestEnemy();
-void* LocalPlayer = GetLocalPlayer(CurrentMatch);
+if (!UNIVERSAL_READY) return; void* closestEnemy = GetClosestEnemy();
+if (!CurrentMatch) return; void* LocalPlayer = GetLocalPlayer(CurrentMatch);
 
 if (closestEnemy != NULL && LocalPlayer != NULL && CurrentMatch != NULL) {
     Vector3 EnemyLocation = GetHeadPosition(closestEnemy);
@@ -274,7 +274,7 @@ if (Enable && UNIVERSAL_READY) {
         void* local_player = GetLocalPlayer(current_Match);
 
         if (local_player && current_Match) {
-            auto* players = *(monoDictionary<uint8_t*, void**>**)((long)current_Match + UNIVERSAL_LIST_OFFSET);
+            if (UNIVERSAL_LIST_OFFSET == (size_t)-1) return; auto* players_ptr = (void**)((long)current_Match + UNIVERSAL_LIST_OFFSET); if (!players_ptr || !*players_ptr) return; auto* players = *(monoDictionary<uint8_t*, void**>**)players_ptr;
             void* camera = Camera_main();
 
             if (players && camera) {
@@ -449,7 +449,7 @@ if(Aimbot) {
 if (SilentAim) {
 void *CurrentMatch = Curent_Match();
 if (CurrentMatch != NULL) {
-void* LocalPlayer = GetLocalPlayer(CurrentMatch);
+if (!CurrentMatch) return; void* LocalPlayer = GetLocalPlayer(CurrentMatch);
 if (LocalPlayer != NULL)  {
 bool visible = get_isVisible(LocalPlayer);
 if (visible) {
