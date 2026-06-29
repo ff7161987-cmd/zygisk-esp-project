@@ -249,23 +249,25 @@ void* CurrentMatch = Curent_Match();
 void* closestEnemy = GetClosestEnemy();
 void* LocalPlayer = GetLocalPlayer(CurrentMatch);
 
-if (closestEnemy != NULL && LocalPlayer != NULL && CurrentMatch != NULL) {
-    Vector3 EnemyLocation = GetHeadPosition(closestEnemy);
-    Vector3 PlayerLocation = CameraMain(LocalPlayer);
-    Quaternion PlayerLook = GetRotationToTheLocation(EnemyLocation, 0.1f, PlayerLocation);
-    bool IsScopeOn = get_IsSighting(LocalPlayer);
-    bool IsFiring = get_IsFiring(LocalPlayer);
-    if (AimWhen == 0) {
-        set_aim(LocalPlayer, PlayerLook);
-    }
-    else if (AimWhen == 1 && IsFiring) {
-        set_aim(LocalPlayer, PlayerLook);
-    }
-    else if (AimWhen == 2 && IsScopeOn) {
-        set_aim(LocalPlayer, PlayerLook);
-    }
-    
-}
+	if (closestEnemy != NULL && LocalPlayer != NULL && CurrentMatch != NULL) {
+	    void* headTransform = GetHeadPositions(closestEnemy);
+	    if (headTransform != nullptr) {
+	        Vector3 EnemyLocation = get_position(headTransform);
+	        Vector3 PlayerLocation = CameraMain(LocalPlayer);
+	        Quaternion PlayerLook = GetRotationToTheLocation(EnemyLocation, 0.1f, PlayerLocation);
+	        bool IsScopeOn = get_IsSighting(LocalPlayer);
+	        bool IsFiring = get_IsFiring(LocalPlayer);
+	        if (AimWhen == 0) {
+	            set_aim(LocalPlayer, PlayerLook);
+	        }
+	        else if (AimWhen == 1 && IsFiring) {
+	            set_aim(LocalPlayer, PlayerLook);
+	        }
+	        else if (AimWhen == 2 && IsScopeOn) {
+	            set_aim(LocalPlayer, PlayerLook);
+	        }
+	    }
+	}
 }
 if (Enable) {        
         int enemyIndex = 0; 
@@ -276,16 +278,23 @@ if (Enable) {
             auto* players = *(monoDictionary<uint8_t*, void**>**)((long)current_Match + m_ShortIDToPlayers);
             void* camera = Camera_main();
 
-            if (players && camera) {
-                for (int u = 0; u < players->getNumValues(); u++) {
-                    void* closestEnemy = players->getValues()[u];
-                  if (closestEnemy != local_player && closestEnemy && get_isVisible(closestEnemy) && !get_isLocalTeam(closestEnemy, true)) {enemyIndex++;
-                        Vector3 Toepos = getPosition(closestEnemy);
-                        Vector3 Toeposi = WorldToScreenPoint(camera, Toepos);
-                        if (Toeposi.z < 1) continue;
-                        Vector3 HeadPos = getPosition(closestEnemy) + Vector3(0, 1.9f, 0);
-                        Vector3 HeadPosition = WorldToScreenPoint(camera, HeadPos);
-                        if (HeadPosition.z < 1) continue;
+	            if (players && camera) {
+	                for (int u = 0; u < players->getNumValues(); u++) {
+	                    void* closestEnemy = players->getValues()[u];
+	                    if (!closestEnemy || closestEnemy == local_player) continue;
+	                    
+	                    if (get_isVisible(closestEnemy) && !get_isLocalTeam(closestEnemy, true)) {
+	                        enemyIndex++;
+	                        void* transform = Component_GetTransform(closestEnemy);
+	                        if (!transform) continue;
+	                        
+	                        Vector3 Toepos = get_position(transform);
+	                        Vector3 Toeposi = WorldToScreenPoint(camera, Toepos);
+	                        if (Toeposi.z < 1) continue;
+	                        
+	                        Vector3 HeadPos = Toepos + Vector3(0, 1.9f, 0);
+	                        Vector3 HeadPosition = WorldToScreenPoint(camera, HeadPos);
+	                        if (HeadPosition.z < 1) continue;
                         {float cx = screenWidth / 2.0f;
                         float cy = screenHeight / 2.0f;
                         float radius = Fov_Aim;
