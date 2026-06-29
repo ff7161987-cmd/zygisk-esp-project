@@ -288,13 +288,15 @@ if (Enable) {
 	                        void* transform = Component_GetTransform(closestEnemy);
 	                        if (!transform) continue;
 	                        
-	                        Vector3 Toepos = get_position(transform);
-	                        Vector3 Toeposi = WorldToScreenPoint(camera, Toepos);
-	                        if (Toeposi.z < 1) continue;
-	                        
-	                        Vector3 HeadPos = Toepos + Vector3(0, 1.9f, 0);
-	                        Vector3 HeadPosition = WorldToScreenPoint(camera, HeadPos);
-	                        if (HeadPosition.z < 1) continue;
+                        Vector3 Toepos = get_position(transform);
+                        if (Toepos.x == 0 && Toepos.y == 0) continue; // Safe Check
+                        
+                        Vector3 Toeposi = WorldToScreenPoint(camera, Toepos);
+                        if (Toeposi.z < 1.0f || Toeposi.z > 500.0f) continue;
+                        
+                        Vector3 HeadPos = Toepos + Vector3(0, 1.8f, 0);
+                        Vector3 HeadPosition = WorldToScreenPoint(camera, HeadPos);
+                        if (HeadPosition.z < 1.0f) continue;
                         {float cx = screenWidth / 2.0f;
                         float cy = screenHeight / 2.0f;
                         float radius = Fov_Aim;
