@@ -173,7 +173,8 @@ void hack_thread(pid_t pid) {
     sleep(5);
     Il2CppAttach();
     
-    void* addr_bypass = (void*)Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("UpdateRotation"), 2);
+    char* updateRotationArgs[] = { OBFUSCATE("UnityEngine.Quaternion"), OBFUSCATE("System.Single"), OBFUSCATE("System.Single") };
+    void* addr_bypass = (void*)Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("COW.GamePlay.IPhysicalCharacter.UpdateRotation"), updateRotationArgs, 3);
     if (addr_bypass) DobbyHook(addr_bypass, (void *) Modify_Bypass_RamaModz, (void **)&ori_bypass_ramamodz);
 
     void* addr_camera = (void*)Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("FollowCamera"), OBFUSCATE("get_OffsetForNormal"), 0);

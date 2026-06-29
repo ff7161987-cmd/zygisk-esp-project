@@ -125,7 +125,7 @@ static Quaternion GetRotation(void* player) {
 
 #define Name (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("get_NickName"), 0)
 
-#define Aim (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("set_m_AimRotation"), 1)
+#define Aim (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("ForceUpdateRotation"), 0)
 #define Scope (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("get_IsSighting"),0 )
 
 #define Fire (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("IsFiring"), 0)
@@ -136,7 +136,7 @@ static Quaternion GetRotation(void* player) {
 
 #define GetCar (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("get_IsDriver"), 0)
 
-#define Head (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("GetHeadTF"), 0)
+#define Head (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("Assembly-CSharp.dll"), OBFUSCATE("COW.GamePlay"), OBFUSCATE("Player"), OBFUSCATE("get_HeadBoneTransform"), 0)
 
 #define ForWard (uintptr_t) Il2CppGetMethodOffset(OBFUSCATE("UnityEngine.dll"), OBFUSCATE("UnityEngine"), OBFUSCATE("Transform"), OBFUSCATE("get_forward"), 0)
 
@@ -274,8 +274,9 @@ static bool IsDriver(void *player) {
 
 
 static void set_aim(void *player, Quaternion look) {
-    void (*_set_aim)(void *players, Quaternion lock) = (void (*)(void *, Quaternion))(Aim);
-    _set_aim(player, look);
+    // Usando ForceUpdateRotation como alternativa já que set_m_AimRotation sumiu
+    void (*_ForceUpdateRotation)(void *players) = (void (*)(void *))(Aim);
+    if (_ForceUpdateRotation) _ForceUpdateRotation(player);
 }
 
 char get_Chars(monoString *str, int index){
@@ -313,7 +314,11 @@ static Vector3 GetHeadPosition(void* player) {
 }
 
 static Vector3 CameraMain(void* player){
-    return get_position(*(void**) ((uint64_t) player + MainCam));
+    void* mainCam = Camera_main();
+    if (mainCam) {
+        return Transform_GetPosition(Component_GetTransform(mainCam));
+    }
+    return Vector3::zero();
 }
 
 

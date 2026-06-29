@@ -252,7 +252,7 @@ void* LocalPlayer = GetLocalPlayer(CurrentMatch);
 if (closestEnemy != NULL && LocalPlayer != NULL && CurrentMatch != NULL) {
     Vector3 EnemyLocation = GetHeadPosition(closestEnemy);
     Vector3 PlayerLocation = CameraMain(LocalPlayer);
-    Quaternion PlayerLook = GetRotationToLocation(EnemyLocation, 0.1f, PlayerLocation);
+    Quaternion PlayerLook = GetRotationToTheLocation(EnemyLocation, 0.1f, PlayerLocation);
     bool IsScopeOn = get_IsSighting(LocalPlayer);
     bool IsFiring = get_IsFiring(LocalPlayer);
     if (AimWhen == 0) {
@@ -441,8 +441,8 @@ if (Config.ESP.RamaMods) {
         IM_COL32(255, 255, 255, 255),
         watermarkText.c_str());}}
 bool SilentAim;
-void (*ori_bypass_ramamodz)(void *, float, float);
-void Modify_Bypass_RamaModz(void *_this, float a1, float a2) {
+Quaternion (*ori_bypass_ramamodz)(void *, Quaternion, float, float);
+Quaternion Modify_Bypass_RamaModz(void *_this, Quaternion baseRotation, float gameTime, float deltaTime) {
 if (_this != nullptr) {
 if(Aimbot) {
 if (SilentAim) {
@@ -453,9 +453,9 @@ if (LocalPlayer != NULL)  {
 bool visible = get_isVisible(LocalPlayer);
 if (visible) {
 if (get_IsFiring(GetLocalPlayer(CurrentMatch))) {
-return;
-} else {
-ori_bypass_ramamodz(_this, a1, a2);}}}}}}ori_bypass_ramamodz(_this, a1, a2);}}
+	return baseRotation;
+	} else {
+	return ori_bypass_ramamodz(_this, baseRotation, gameTime, deltaTime);}}}}}}return ori_bypass_ramamodz(_this, baseRotation, gameTime, deltaTime);}}
 bool Guest;
 bool (*ResetGuest)(void* _this);
 bool _ResetGuest(void* _this) {
