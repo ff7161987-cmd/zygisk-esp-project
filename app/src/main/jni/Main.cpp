@@ -30,7 +30,7 @@ class MyModule : public zygisk::ModuleBase {
   void preAppSpecialize(AppSpecializeArgs *args) override {
     static constexpr const char *packages[] = {
         "com.dts.freefireth",
-        "com.dts.freefiremax"
+        "com.tech.barbosa"
     };
     const char *process = env_->GetStringUTFChars(args->nice_name, nullptr);
     for (const auto *package: packages) {
